@@ -159,3 +159,25 @@
 .comment-form_btn {
   @apply rounded-3xl bg-primary-500 px-8 py-2 !text-small-regular text-light-1 max-xs:w-full !important;
 }
+
+@layer base {
+  h1 {
+    @apply text-[32px];
+  }
+  h2 {
+    @apply text-[24px];
+  }
+  h3 {
+    @apply text-[18px];
+  }
+  h4 {
+    @apply text-[17px];
+  }
+  h5 {
+    @apply text-[16px];
+  }
+  a {
+    @apply text-blue underline;
+  }
+  /* ... */
+}
