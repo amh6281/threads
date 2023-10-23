@@ -176,8 +176,5 @@
   h5 {
     @apply text-[16px];
   }
-  a {
-    @apply text-blue underline;
-  }
   /* ... */
 }
