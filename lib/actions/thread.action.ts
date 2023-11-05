@@ -37,3 +37,39 @@ export async function createThread({
     throw new Error(`Failed to create thread: ${err.message}`);
   }
 }
+
+export async function fetchPosts(pageNumber = 1, pageSize = 20) {
+  connectToDB();
+
+  // 페이지 번호, 페이지 크기를 기준으로 건너뛸 게시물 수
+  const skipAmount = (pageNumber - 1) * pageSize;
+
+  // 최상위 스레드
+  const postsQuery = Thread.find({ parentId: { $in: [null, undefined] } })
+    .sort({ createdAt: "desc" })
+    .skip(skipAmount)
+    .limit(pageSize)
+    .populate({
+      path: "author",
+      model: User,
+    })
+    .populate({
+      path: "children",
+      populate: {
+        path: "author",
+        model: User,
+        select: "_id name parentId image",
+      },
+    });
+
+  // 최상위 스레드 개수
+  const totalPostsCount = await Thread.countDocuments({
+    parentId: { $in: [null, undefined] },
+  });
+
+  const posts = await postsQuery.exec();
+
+  const isNext = totalPostsCount > skipAmount + posts.length;
+
+  return { posts, isNext };
+}
