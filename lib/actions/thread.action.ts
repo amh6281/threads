@@ -111,3 +111,38 @@ export async function fetchThreadById(threadId: string) {
     throw new Error("Unable to fetch thread");
   }
 }
+
+export async function addCommentToThread(
+  threadId: string,
+  commentText: string,
+  userId: string,
+  path: string
+) {
+  connectToDB();
+
+  try {
+    // threadId를 이용한 thread 검색
+    const originalThread = await Thread.findById(threadId);
+
+    // thread가 검색되지 않으면...
+    if (!originalThread) {
+      throw new Error("Thread not found");
+    }
+
+    // thread 내 comment 생성
+    const commentThread = new Thread({
+      text: commentText,
+      author: userId,
+      parentId: threadId,
+    });
+
+    // originalThread의 children에 저장
+    const savedCommentThread = await commentThread.save();
+    originalThread.children.push(savedCommentThread._id);
+    await originalThread.save();
+
+    revalidatePath(path);
+  } catch (err: any) {
+    throw new Error(`Failed to create thread: ${err.message}`);
+  }
+}
